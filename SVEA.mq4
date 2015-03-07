@@ -9,7 +9,7 @@
 
 
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
-#property link      "https://github.com/LeonardoCiaccio"
+#property link      "https://github.com/LeonardoCiaccio/SVEA"
 
 extern string  Name                    =  "SVEA (Super Visor EA)";
 extern string  Version                 =  "v.1.0.3";
