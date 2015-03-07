@@ -1,20 +1,20 @@
 //+------------------------------------------------------------------+
 //|                                                         SVEA.mq4 |
-//|                               Copyright © 2015, Leonardo Ciaccio |
-//|                               https://github.com/LeonardoCiaccio |
+//|                               Copyright Â© 2015, Leonardo Ciaccio |
+//|                          https://github.com/LeonardoCiaccio/SVEA |
 //|                                                                  |
 //|             Donate Bitcoins : 1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B |
 //|             Donate PayPal   : microlabs@altervista.org           |
 //+------------------------------------------------------------------+
 
 
-#property copyright "Copyright © 2015, Leonardo Ciaccio"
+#property copyright "Copyright Â© 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio"
 
 extern string  Name                    =  "SVEA (Super Visor EA)";
 extern string  Version                 =  "v.1.0.3";
 extern string  Contact                 =  "leonardo.ciaccio@gmail.com";
-extern string  Web                     =  "https://github.com/LeonardoCiaccio";
+extern string  Web                     =  "https://github.com/LeonardoCiaccio/SVEA";
 extern string  Donate_Bitcoins         =  "1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B";
 extern string  Donate_PayPal           =  "microlabs@altervista.org";
 extern string  Common_start            =  "[ Commons Options ]";
