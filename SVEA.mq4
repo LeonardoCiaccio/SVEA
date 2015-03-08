@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                         SVEA.mq4 |
-//|                               Copyright Â© 2015, Leonardo Ciaccio |
+//|                               Copyright © 2015, Leonardo Ciaccio |
 //|                          https://github.com/LeonardoCiaccio/SVEA |
 //|                                                                  |
 //|             Donate Bitcoins : 1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B |
@@ -8,11 +8,11 @@
 //+------------------------------------------------------------------+
 
 
-#property copyright "Copyright Â© 2015, Leonardo Ciaccio"
+#property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 
 extern string  Name                    =  "SVEA (Super Visor EA)";
-extern string  Version                 =  "v.1.0.3";
+extern string  Version                 =  "v.1.0.4";
 extern string  Contact                 =  "leonardo.ciaccio@gmail.com";
 extern string  Web                     =  "https://github.com/LeonardoCiaccio/SVEA";
 extern string  Donate_Bitcoins         =  "1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B";
@@ -21,10 +21,10 @@ extern string  Common_start            =  "[ Commons Options ]";
 extern int     Magic_Number            =  173;
 extern bool    Stealth_Mode            =  true;
 extern double  Max_Spread              =  2.5;
-extern double  Default_Lot             =  0.1;
+extern double  Default_Lot             =  0.01;
 extern int     Slippage                =  3;
-extern double  Take_Profit             =  50.0;
-extern double  Stop_Loss               =  50.0;
+extern double  Take_Profit             =  30.0;
+extern double  Stop_Loss               =  30.0;
 extern bool    Show_Box_Information    =  true;
 extern int     Box_X                   =  70;
 extern int     Box_Y                   =  70;
@@ -33,11 +33,11 @@ extern color   Color_Box_font          =  White;
 extern color   Color_Box_font_value    =  Lime;
 extern string  Safe_Trailing_start     =  "[ Safe/Trailing Options ]";
 extern bool    Use_Safe_Trade          =  true;
-extern double  Safe_Trade_On           =  15.0;                                  
-extern double  Safe_Trade_At           =  5.0;
+extern double  Safe_Trade_On           =  10.0;                                  
+extern double  Safe_Trade_At           =  0.0;
 extern bool    Use_Trailing            =  true;
 extern double  Trailing_Start          =  20.0;
-extern double  Trailing_For            =  10.0;
+extern double  Trailing_For            =  5.0;
 extern bool    Trailing_Ignore_TP      =  true;                    
 extern string  Open_Manual_start       =  "[ Open/Close Manual with Horizontal Line ]";
 extern bool    Ignore_Max_Spread       =  false;
@@ -49,18 +49,18 @@ extern string  HL_CLOSE_OVER_Name      =  "CLOSEOVER";
 extern string  HL_CLOSE_UNDER_Name     =  "CLOSEUNDER";
 extern string  Open_Automatic_start    =  "[ Open Automatic ]";
 extern bool    Open_Automatic          =  true;
-extern bool    Auto_Ignore_Max_Spread  =  true;
+extern bool    Auto_Ignore_Max_Spread  =  false;
 extern bool    Signal_In_Combo         =  false;
 extern string  Open_Automatic_1        =  "-------------------------------------";
 extern bool    Trade_In_Friday         =  true;
 extern string  Open_Automatic_2        =  "-------------------------------------";
 extern bool    Use_Trade_Time          =  true;
-extern int     Trade_Time_H_Start      =  6;
+extern int     Trade_Time_H_Start      =  9;
 extern int     Trade_Time_m_Start      =  0;
-extern int     Trade_Time_H_Stop       =  19;
+extern int     Trade_Time_H_Stop       =  11;
 extern int     Trade_Time_m_Stop       =  0;
 extern string  Open_Automatic_3        =  "-------------------------------------";
-extern bool    Use_Force_Index         =  true;
+extern bool    Use_Force_Index         =  false;
 extern bool    IForce_logic_reverse    =  false;
 extern int     IForce_TimeFrame        =  1;
 extern int     IForce_Period           =  1;
@@ -70,9 +70,9 @@ extern int     IForce_Shift            =  0;
 extern double  IForce_level_BUY        =  0.1;
 extern double  IForce_level_SELL       =  -0.1;
 extern string  Open_Automatic_4        =  "-------------------------------------";
-extern bool    Use_RSI                 =  false;
+extern bool    Use_RSI                 =  true;
 extern bool    IRSI_logic_reverse      =  false;
-extern int     IRSI_TimeFrame          =  1;
+extern int     IRSI_TimeFrame          =  5;
 extern int     IRSI_Period             =  3;
 extern int     IRSI_Price              =  0;
 extern int     IRSI_Shift              =  1;
@@ -98,15 +98,15 @@ extern int     IMOM_Period             =  89;
 extern int     IMOM_Price              =  0;
 extern int     IMOM_Shift_For_Rising   =  5;
 extern string  Close_Strategy_start    =  "[ Close Strategy ]";
-extern bool    Use_Positive_Grid       =  true;
+extern bool    Use_Positive_Grid       =  false;
 extern int     PGrid                   =  25;
 extern int     PGrid_Max               =  1;
 extern int     PGrid_Stop              =  10;
 extern bool    Use_Negative_Grid       =  true;
 extern int     NGrid                   =  25;
-extern int     NGrid_Max               =  1;
+extern int     NGrid_Max               =  3;
 extern int     NGrid_Multiplier        =  2;
-extern double  NGrid_Increment         =  0.1;
+extern double  NGrid_Increment         =  0.01;
 extern double  NGrid_1_TP_In_Money     =  0.0;
 extern double  NGrid_2_TP_In_Money     =  0.0;
 extern double  NGrid_3_TP_In_Money     =  0.0;
@@ -116,7 +116,7 @@ extern double  NGrid_over_TP_In_Money  =  0.0;
 //| Common                                                           |
 //+------------------------------------------------------------------+
 string RealName_EA         =  "SVEA";
-string RealVersion_EA      =  "1.0.3";
+string RealVersion_EA      =  "1.0.4";
 string Real_Email          =  "leonardo.ciaccio@gmail.com";
 string Comment_Open_Manual =  "SVEA Opened with H. Line";
 string Comment_Open_Auto   =  "SVEA Opened with Signal";
@@ -1287,8 +1287,9 @@ void open_manual_mode(){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
          }else if(ObjectDelete(HL_BUY_OVER_Name)){
-            
+         
             if(ObjectFind(HL_BUY_OVER_Name) >= 0)return(0);
+            remove_all_HL_for_open();
             
             result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
@@ -1305,8 +1306,9 @@ void open_manual_mode(){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
          }else if(ObjectDelete(HL_BUY_UNDER_Name)){
-            
+         
             if(ObjectFind(HL_BUY_UNDER_Name) >= 0)return(0);
+            remove_all_HL_for_open();
             
             result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
@@ -1323,8 +1325,9 @@ void open_manual_mode(){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
          }else if(ObjectDelete(HL_SELL_OVER_Name)){
-            
+         
             if(ObjectFind(HL_SELL_OVER_Name) >= 0)return(0);
+            remove_all_HL_for_open();
          
             result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
@@ -1341,8 +1344,9 @@ void open_manual_mode(){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
          }else if(ObjectDelete(HL_SELL_UNDER_Name)){
-            
+         
             if(ObjectFind(HL_SELL_UNDER_Name) >= 0)return(0);
+            remove_all_HL_for_open();
             
             result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
@@ -1433,6 +1437,8 @@ void open_auto_mode(){
       result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_Auto,Magic_Number,0,CLR_NONE);
       if(result<0){
          Print("SVEA Error open buy Auto, "+GetLastError());
+      }else{
+         remove_all_HL_for_open();
       }
       RefreshRates();
    
@@ -1440,6 +1446,8 @@ void open_auto_mode(){
       result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_Auto,Magic_Number,0,CLR_NONE);
       if(result<0){
          Print("SVEA Error open sell Auto, "+GetLastError());
+      }else{
+         remove_all_HL_for_open();
       }
       RefreshRates();
    }
@@ -1485,5 +1493,18 @@ void close_manual(){
       }
       
    }   
+
+}
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//| Delete all HL for open trade                                     |     
+//+------------------------------------------------------------------+
+void remove_all_HL_for_open(){
+
+   ObjectDelete(HL_BUY_OVER_Name);
+   ObjectDelete(HL_BUY_UNDER_Name);
+   ObjectDelete(HL_SELL_OVER_Name);
+   ObjectDelete(HL_SELL_UNDER_Name);
 
 }
