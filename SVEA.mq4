@@ -10,107 +10,168 @@
 
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
+#property description "Super Visor Expert Advisor"
+#property version "2.01"
+#property strict
 
+enum __q{
+
+   Yes = 1,
+   No  = 0
+
+};
+
+enum __tf{
+
+   cu    = 0,    // Current 
+   m1    = 1,    // 1 Minute
+   m5    = 5,    // 5 Minutes
+   m15   = 15,   // 15 Minutes
+   m30   = 30,   // 30 Minutes
+   h1    = 60,   // 1 Hour
+   h4    = 240,  // 4 Hours
+   d1    = 1440, // 1 Day
+   w1    = 10080,// 1 Week
+   mn1   = 43200 // 1 Month
+
+};
+
+enum __iSline{
+
+   main   = 0,      // Base Indicator Line
+   signal = 1       // Signal Line
+
+};
+
+extern string  Info                    =  "--------------------------------------------------------";// ------- SVEA INFORMATION
 extern string  Name                    =  "SVEA (Super Visor EA)";
-extern string  Version                 =  "v.1.0.4";
-extern string  Contact                 =  "leonardo.ciaccio@gmail.com";
-extern string  Web                     =  "https://github.com/LeonardoCiaccio/SVEA";
-extern string  Donate_Bitcoins         =  "1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B";
-extern string  Donate_PayPal           =  "microlabs@altervista.org";
-extern string  Common_start            =  "[ Commons Options ]";
-extern int     Magic_Number            =  173;
-extern bool    Stealth_Mode            =  true;
-extern double  Max_Spread              =  2.5;
-extern double  Default_Lot             =  0.01;
+extern string  Contact                 =  "leonardo.ciaccio@gmail.com";                              // Contact Me 
+extern string  Web                     =  "https://github.com/LeonardoCiaccio/SVEA";                 // Project Open Source
+extern string  Donate_Bitcoins         =  "1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B";                      // Donate Bitcoins 
+extern string  Donate_PayPal           =  "microlabs@altervista.org";                                // Donate PayPal  
+extern string  Space1                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Setup                   =  "--------------------------------------------------------";// ------- SETUP Information
+extern int     Magic_Number            =  173;                                                       // Magic Number ( ignore it )
+extern __q     Stealth_Mode            =  Yes;                                                       // Hide Information To Broker ?
+extern double  Max_Spread              =  2.5;                                                       // Max Spread Allowed 
+extern double  Risk                    =  5.0;                                                       // Percentage Risk For Trade
+extern double  MinLots                 =  0.01;                                                      // Min Lots Allowed
+extern double  MaxLots                 =  5.0;                                                       // Max Lots Allowed
 extern int     Slippage                =  3;
-extern double  Take_Profit             =  30.0;
-extern double  Stop_Loss               =  30.0;
-extern bool    Show_Box_Information    =  true;
-extern int     Box_X                   =  70;
-extern int     Box_Y                   =  70;
-extern color   Color_Title_font        =  Red;
-extern color   Color_Box_font          =  White;
-extern color   Color_Box_font_value    =  Lime;
-extern string  Safe_Trailing_start     =  "[ Safe/Trailing Options ]";
-extern bool    Use_Safe_Trade          =  true;
-extern double  Safe_Trade_On           =  10.0;                                  
-extern double  Safe_Trade_At           =  0.0;
-extern bool    Use_Trailing            =  true;
-extern double  Trailing_Start          =  20.0;
-extern double  Trailing_For            =  5.0;
-extern bool    Trailing_Ignore_TP      =  true;                    
-extern string  Open_Manual_start       =  "[ Open/Close Manual with Horizontal Line ]";
-extern bool    Ignore_Max_Spread       =  false;
-extern string  HL_BUY_OVER_Name        =  "BUYOVER";
-extern string  HL_BUY_UNDER_Name       =  "BUYUNDER";
-extern string  HL_SELL_OVER_Name       =  "SELLOVER";
-extern string  HL_SELL_UNDER_Name      =  "SELLUNDER";
-extern string  HL_CLOSE_OVER_Name      =  "CLOSEOVER";
-extern string  HL_CLOSE_UNDER_Name     =  "CLOSEUNDER";
-extern string  Open_Automatic_start    =  "[ Open Automatic ]";
-extern bool    Open_Automatic          =  true;
-extern bool    Auto_Ignore_Max_Spread  =  false;
-extern bool    Signal_In_Combo         =  false;
-extern string  Open_Automatic_1        =  "-------------------------------------";
-extern bool    Trade_In_Friday         =  true;
-extern string  Open_Automatic_2        =  "-------------------------------------";
-extern bool    Use_Trade_Time          =  true;
-extern int     Trade_Time_H_Start      =  9;
-extern int     Trade_Time_m_Start      =  0;
-extern int     Trade_Time_H_Stop       =  11;
-extern int     Trade_Time_m_Stop       =  0;
-extern string  Open_Automatic_3        =  "-------------------------------------";
-extern bool    Use_Force_Index         =  false;
-extern bool    IForce_logic_reverse    =  false;
-extern int     IForce_TimeFrame        =  1;
-extern int     IForce_Period           =  1;
-extern int     IForce_Method           =  0;
-extern int     IForce_Price            =  0;
-extern int     IForce_Shift            =  0;
-extern double  IForce_level_BUY        =  0.1;
-extern double  IForce_level_SELL       =  -0.1;
-extern string  Open_Automatic_4        =  "-------------------------------------";
-extern bool    Use_RSI                 =  true;
-extern bool    IRSI_logic_reverse      =  false;
-extern int     IRSI_TimeFrame          =  5;
-extern int     IRSI_Period             =  3;
-extern int     IRSI_Price              =  0;
-extern int     IRSI_Shift              =  1;
-extern double  IRSI_level_BUY          =  5.0;
-extern double  IRSI_level_SELL         =  95.0;
-extern string  Open_Automatic_5        =  "-------------------------------------";
-extern bool    Use_Stochastic          =  false;
-extern bool    IStoch_logic_reverse    =  false;
-extern int     IStochastic_TimeFrame   =  1;
-extern int     IStochastic_KPeriod     =  5;
-extern int     IStochastic_DPeriod     =  3;
-extern int     IStochastic_Slow        =  3;
-extern int     IStochastic_Method      =  0;
-extern int     IStochastic_Field       =  1;
-extern int     IStochastic_Mode        =  1;
-extern int     IStochastic_Shift       =  1;
-extern double  IStochastic_level_BUY   =  5.0;
-extern double  IStochastic_level_SELL  =  95.0;
-extern string  Open_Automatic_6        =  "-------------------------------------";
-extern bool    Use_Momentum            =  false;                      
-extern int     IMOM_TimeFrame          =  1;
-extern int     IMOM_Period             =  89;
-extern int     IMOM_Price              =  0;
-extern int     IMOM_Shift_For_Rising   =  5;
-extern string  Close_Strategy_start    =  "[ Close Strategy ]";
-extern bool    Use_Positive_Grid       =  false;
-extern int     PGrid                   =  25;
-extern int     PGrid_Max               =  1;
-extern int     PGrid_Stop              =  10;
-extern bool    Use_Negative_Grid       =  true;
-extern int     NGrid                   =  25;
-extern int     NGrid_Max               =  3;
-extern int     NGrid_Multiplier        =  2;
-extern double  NGrid_Increment         =  0.01;
-extern double  NGrid_1_TP_In_Money     =  0.0;
-extern double  NGrid_2_TP_In_Money     =  0.0;
-extern double  NGrid_3_TP_In_Money     =  0.0;
-extern double  NGrid_over_TP_In_Money  =  0.0;
+extern double  Take_Profit             =  30.0;                                                      // Take Profit
+extern double  Stop_Loss               =  30.0;                                                      // Stop Loss 
+extern __q     Show_Box_Information    =  Yes;                                                       // Show Box Information ? 
+extern int     Box_X                   =  70;                                                        // Box Position X
+extern int     Box_Y                   =  70;                                                        // Box Position Y       
+extern color   Color_Title_font        =  Red;                                                       // Color Box Title 
+extern color   Color_Box_font          =  Black;                                                     // Color Box Name 
+extern color   Color_Box_font_value    =  Lime;                                                      // Color Box Value 
+extern string  Space2                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Safe_Trailing_start     =  "--------------------------------------------------------";// ------- SETUP SafeTrade & Trailing
+extern __q     Use_Safe_Trade          =  Yes;                                                       // Use Safe-Trade ?  
+extern double  Safe_Trade_On           =  10.0;                                                      // Active Safe-Trade On 
+extern double  Safe_Trade_At           =  1.0;                                                       // Close Trade With Safe-Trade At 
+extern __q     Use_Trailing            =  Yes;                                                       // Use Trailing ?
+extern double  Trailing_Start          =  20.0;                                                      // Active Trailing On 
+extern double  Trailing_For            =  10.0;                                                      // Move Trailing For 
+extern __q     Trailing_Ignore_TP      =  Yes;                                                       // Trailing Ignore Take Profit ?
+extern string  Space3                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Manual_start       =  "--------------------------------------------------------";// ------- SETUP Manual Data
+extern __q     Ignore_Max_Spread       =  No;                                                        // Manual Ignore Max Spread ?
+extern string  HL_BUY_OVER_Name        =  "BO";                                                      // Name For Buy Over H-Line 
+extern string  HL_BUY_UNDER_Name       =  "BU";                                                      // Name For Buy Under H-Line
+extern string  HL_SELL_OVER_Name       =  "SO";                                                      // Name For Sell Over H-Line
+extern string  HL_SELL_UNDER_Name      =  "SU";                                                      // Name For Sell Under H-Line
+extern string  HL_CLOSE_OVER_Name      =  "CO";                                                      // Name For Close All Over H-Line
+extern string  HL_CLOSE_UNDER_Name     =  "CU";                                                      // Name For Close All Under H-Line
+extern string  Space4                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_start    =  "--------------------------------------------------------";// ------- SETUP Automation Flags
+extern __q     Open_Automatic          =  No;                                                        // Open Trade With Robot ?
+extern __q     Auto_Ignore_Max_Spread  =  No;                                                        // Robot Ignore Max Spread ?
+extern __q     Signal_In_Combo         =  No;                                                        // Robot Signal In Combination  ?
+extern string  Space5                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_1        =  "--------------------------------------------------------";// ------- SETUP Automation Times Range
+extern __q     Trade_In_Friday         =  Yes;                                                       // Trade On Friday ?
+extern __q     Use_Trade_Time          =  No;                                                        // Use Times Range ?
+extern int     Trade_Time_H_Start      =  9;                                                         // Range Hour Start ( example 09:00 )
+extern int     Trade_Time_m_Start      =  0;                                                         // Range Minute Start
+extern int     Trade_Time_H_Stop       =  18;                                                        // Range Hour Stop ( example 18:00 ) 
+extern int     Trade_Time_m_Stop       =  0;                                                         // Range Minute Stop 
+extern string  Space6                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_3        =  "--------------------------------------------------------";// ------- SETUP Automation Signals Force Index
+extern __q     Use_Force_Index         =  No;                                                        // Use Force Index ?
+extern __q     IForce_logic_reverse    =  No;                                                        // Use Reverse Logic ? 
+extern __tf    IForce_TimeFrame        =  m1;                                                        // Time Frame 
+extern int     IForce_Period           =  1;                                                         // Period
+extern ENUM_MA_METHOD     IForce_Method           =  MODE_SMA;                                       // Method 
+extern ENUM_APPLIED_PRICE     IForce_Price        =  PRICE_CLOSE;                                    // Price 
+extern int     IForce_Shift            =  0;                                                         // Shift Bars 
+extern double  IForce_level_BUY        =  0.1;                                                       // Level For Buy Signal 
+extern double  IForce_level_SELL       =  -0.1;                                                      // Level For Sell Signal
+extern string  Space7                  =  "--------------------------------------------------------";// -----------------------------    
+extern string  Open_Automatic_4        =  "--------------------------------------------------------";// ------- SETUP Automation Signals RSI
+extern __q     Use_RSI                 =  No;                                                        // Use RSI ? 
+extern __q     IRSI_logic_reverse      =  No;                                                        // Use Reverse Logic ?
+extern __tf    IRSI_TimeFrame          =  m1;                                                        // Time Frame 
+extern int     IRSI_Period             =  3;                                                         // Period 
+extern ENUM_APPLIED_PRICE     IRSI_Price          =  PRICE_CLOSE;                                    // Price 
+extern int     IRSI_Shift              =  0;                                                         // Shift Bars 
+extern double  IRSI_level_BUY          =  5.0;                                                       // Level For Buy Signal 
+extern double  IRSI_level_SELL         =  95.0;                                                      // Level For Sell Signal 
+extern string  Space8                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_5        =  "--------------------------------------------------------";// ------- SETUP Automation Signals Stochastic
+extern __q     Use_Stochastic          =  No;                                                        // Use Stochastic ? 
+extern __q     IStoch_logic_reverse    =  No;                                                        // Use Reverse Logic ?
+extern __tf    IStochastic_TimeFrame   =  m1;                                                        // Time Frame 
+extern int     IStochastic_KPeriod     =  5;                                                         // Period Of The %K Line 
+extern int     IStochastic_DPeriod     =  3;                                                         // Period Of The %D Line
+extern int     IStochastic_Slow        =  3;                                                         // Slowing value 
+extern ENUM_MA_METHOD     IStochastic_Method      =  MODE_SMA;                                       // Method
+extern int     IStochastic_Field       =  0;                                                         // Price Field ( 0 = Low/High; 1 = Close/Close ) 
+extern __iSline     IStochastic_Mode              =  signal;                                         // Mode       
+extern int     IStochastic_Shift       =  0;                                                         // Shift Bars 
+extern double  IStochastic_level_BUY   =  5.0;                                                       // Level For Buy Signal
+extern double  IStochastic_level_SELL  =  95.0;                                                      // Level For Sell Signal
+extern string  Space9                  =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_6        =  "--------------------------------------------------------";// ------- SETUP Trend Momentum
+extern __q     Use_Momentum            =  No;                                                        // Use Momentum For Trend ?
+extern __tf    IMOM_TimeFrame          =  m1;                                                        // Time Frame 
+extern int     IMOM_Period             =  89;                                                        // Period
+extern ENUM_APPLIED_PRICE     IMOM_Price          =  PRICE_CLOSE;                                    // Price                                                          
+extern int     IMOM_Shift_For_Rising   =  14;                                                        // Shift Bars For Direction
+extern string  Space10                 =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_7        =  "--------------------------------------------------------";// ------- SETUP Trend SAR
+extern __q     Use_SAR                 =  No;                                                        // Use SAR For Trend ?
+extern __tf    SAR_TimeFrame           =  m1;                                                        // Time Frame
+extern double  SAR_Step                =  0.02;                                                      // Step
+extern double  SAR_Maximum             =  0.2;                                                       // Maximum                                          
+extern int     SAR_Shift_For_Rising    =  0;                                                         // Shift Bars
+extern string  Space11                 =  "--------------------------------------------------------";// -----------------------------
+extern string  Open_Automatic_8        =  "--------------------------------------------------------";// ------- SETUP Direction ADX
+extern __q     Use_ADX                 =  No;                                                        // Use ADX For Direction ?
+extern __q     Use_ADX_Rising          =  Yes;                                                       // Use ADX Rising ?
+extern int     ADX_Shift_For_Signal    =  7;                                                         // Shift Bars For Rising
+extern __tf    ADX_TimeFrame           =  m1;                                                        // Time Frame
+extern int     ADX_Period              =  14;                                                        // Period
+extern ENUM_APPLIED_PRICE     ADX_Price           =  PRICE_CLOSE;                                    // Price
+extern int     ADX_Shift_For_Rising    =  0;                                                         // Shift Bars For Cross
+extern double  ADX_Level               =  18.00;                                                     // ADX Good Level
+extern string  Space12                 =  "--------------------------------------------------------";// -----------------------------
+extern string  Close_Strategy_start    =  "--------------------------------------------------------";// ------- SETUP Close Strategy Positive Grid
+extern __q     Use_Positive_Grid       =  No;                                                        // Use Positive Grid ?
+extern int     PGrid                   =  25;                                                        // Grid Size In Pips       
+extern int     PGrid_Max               =  1;                                                         // Number Of Grids
+extern int     PGrid_Stop              =  10;                                                        // Pips For Safe Stop
+extern string  Space13                 =  "--------------------------------------------------------";// -----------------------------
+extern string  Close_Strategy_start2   =  "--------------------------------------------------------";// ------- SETUP Close Strategy Negative Grid
+extern __q     Use_Negative_Grid       =  No;                                                        // Use Negative Grid ?
+extern int     NGrid                   =  25;                                                        // Grid Size In Pips
+extern int     NGrid_Max               =  3;                                                         // Max Grids
+extern int     NGrid_Multiplier        =  2;                                                         // Multiplier                                                
+extern double  NGrid_1_TP_In_Money     =  0.0;                                                       // Take Profit In Money For 1° Grid
+extern double  NGrid_2_TP_In_Money     =  0.0;                                                       // Take Profit In Money For 2° Grid
+extern double  NGrid_3_TP_In_Money     =  0.0;                                                       // Take Profit In Money For 3° Grid
+extern double  NGrid_over_TP_In_Money  =  0.0;                                                       // Take Profit In Money For Other
 
 //+------------------------------------------------------------------+
 //| Common                                                           |
@@ -122,8 +183,9 @@ string Comment_Open_Manual =  "SVEA Opened with H. Line";
 string Comment_Open_Auto   =  "SVEA Opened with Signal";
 string Comment_Open_PGrid  =  "SVEA Opened with PGrid";
 string Comment_Open_NGrid  =  "SVEA Opened with NGrid";
-double Real_Lot            =  0.0;
+
 double MyPoint             =  0.0;
+double nextSize            =  0.01; 
 bool   al_err_1            =  false;
 string My_Symbol           =  "";
 double My_tt_profit        =  0.0;
@@ -175,10 +237,10 @@ int    Car_Box_size        =  8;
 int init()
   {
 //----
-   Real_Lot            =  Default_Lot;
    MyPoint             =  Point;
    My_Symbol           =  Symbol();
    if(Digits==3 || Digits==5)MyPoint=Point*10;
+   nextSize            =  getSize();
    create_box();
    
 //----
@@ -364,7 +426,7 @@ int control_Pgrid_status(){
 int control_Ngrid_status(){
   
   if(Use_Negative_Grid){
-      bool zero_value=(NGrid==0 || NGrid_Max ==0 || NGrid_Multiplier==0 || NGrid_Increment==0.0 || NGrid<0 || NGrid_Max <0 || NGrid_Multiplier<0 || NGrid_Increment<0.0);
+      bool zero_value=(NGrid==0 || NGrid_Max ==0 || NGrid_Multiplier==0 || nextSize==0.0 || NGrid<0 || NGrid_Max <0 || NGrid_Multiplier<0 || nextSize<0.0);
       bool no_correct=(NGrid>=get_SL_or_TP(0,0) || NGrid>=get_SL_or_TP(1,0) || tt_pgrid_opened>0);
       if(zero_value || no_correct){
          return(2);
@@ -504,13 +566,14 @@ void close_all_order(){
       }
    contaCicli++;    
   }
+  
   if(contaCicli>=TimeOut_Cicli)Print("SVEA error close all, timeout");
 }
 
 //+------------------------------------------------------------------+
 //| Controll and set all Take Profit and StopLoss for PGRID          |
 //+------------------------------------------------------------------+
-void control_Pgrid_order(){
+int control_Pgrid_order(){
      
    if(tt_ngrid_opened>0 || control_Pgrid_status()!=1 || (tt_manual_opened<1 && tt_auto_opened<1))return(0);
   
@@ -538,7 +601,7 @@ void control_Pgrid_order(){
                price_BUY=OrderOpenPrice();
                My_order=OP_BUY;
                if(Ask>= NormalizeDouble(OrderOpenPrice()+(PGrid*My_tt_pgrid)*MyPoint,Digits) && tt_pgrid_opened<PGrid_Max){
-                result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_PGrid,Magic_Number,0,CLR_NONE);
+                result=OrderSend(Symbol(),OP_BUY,nextSize,Ask,Slippage,0,0,Comment_Open_PGrid,Magic_Number,0,CLR_NONE);
                 if(result<0){Print("SVEA error, order PGrid, error number "+GetLastError());break;}
                 if(control_Stealth_status()==1 && OrderStopLoss()>0 && OrderTakeProfit()>0)OrderModify(OrderTicket(),OrderOpenPrice(),0,0,0,CLR_NONE);
                 RefreshRates();
@@ -550,7 +613,7 @@ void control_Pgrid_order(){
                price_SELL=OrderOpenPrice();
                My_order=OP_SELL;
                if(Bid<= NormalizeDouble(OrderOpenPrice()-(PGrid*My_tt_pgrid)*MyPoint,Digits) && tt_pgrid_opened<PGrid_Max){
-                result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_PGrid,Magic_Number,0,CLR_NONE);
+                result=OrderSend(Symbol(),OP_SELL,nextSize,Bid,Slippage,0,0,Comment_Open_PGrid,Magic_Number,0,CLR_NONE);
                 if(result<0){Print("SVEA error, order PGrid, error number "+GetLastError());break;}
                 if(control_Stealth_status()==1 && OrderStopLoss()>0 && OrderTakeProfit()>0)OrderModify(OrderTicket(),OrderOpenPrice(),0,0,0,CLR_NONE);
                 RefreshRates();
@@ -610,14 +673,16 @@ void control_Pgrid_order(){
                }
             }
           }
-   }    
+   }
+   
+   return( 0 );    
    //----------------------------------
 }
 
 //+------------------------------------------------------------------+
 //| Controll and set all Take Profit and StopLoss for NGRID          |
 //+------------------------------------------------------------------+
-void control_Ngrid_order(){
+int control_Ngrid_order(){
      
    switch(tt_ngrid_opened){
       case 0: break;
@@ -672,7 +737,7 @@ void control_Ngrid_order(){
                price_BUY=OrderOpenPrice();
                My_order=OP_BUY;
                if(Ask<= NormalizeDouble(OrderOpenPrice()-(NGrid*My_tt_ngrid)*MyPoint,Digits) && tt_ngrid_opened<NGrid_Max){
-                result=OrderSend(Symbol(),OP_BUY,Default_Lot+(NGrid_Increment*(My_tt_ngrid*NGrid_Multiplier)),Ask,Slippage,0,0,Comment_Open_NGrid,Magic_Number,0,CLR_NONE);
+                result=OrderSend(Symbol(),OP_BUY,nextSize+(nextSize*(My_tt_ngrid*NGrid_Multiplier)),Ask,Slippage,0,0,Comment_Open_NGrid,Magic_Number,0,CLR_NONE);
                 if(result<0){Print("SVEA error, order NGrid, error number "+GetLastError());break;}
                 if(control_Stealth_status()==1 && OrderStopLoss()>0 && OrderTakeProfit()>0)OrderModify(OrderTicket(),OrderOpenPrice(),0,0,0,CLR_NONE);
                 RefreshRates();
@@ -684,7 +749,7 @@ void control_Ngrid_order(){
                price_SELL=OrderOpenPrice();
                My_order=OP_SELL;
                if(Bid>= NormalizeDouble(OrderOpenPrice()+(NGrid*My_tt_ngrid)*MyPoint,Digits) && tt_ngrid_opened<NGrid_Max){
-                result=OrderSend(Symbol(),OP_SELL,Default_Lot+(NGrid_Increment*(My_tt_ngrid*NGrid_Multiplier)),Bid,Slippage,0,0,Comment_Open_NGrid,Magic_Number,0,CLR_NONE);
+                result=OrderSend(Symbol(),OP_SELL,nextSize+(nextSize*(My_tt_ngrid*NGrid_Multiplier)),Bid,Slippage,0,0,Comment_Open_NGrid,Magic_Number,0,CLR_NONE);
                 if(result<0){Print("SVEA error, order NGrid, error number "+GetLastError());break;}
                 if(control_Stealth_status()==1 && OrderStopLoss()>0 && OrderTakeProfit()>0)OrderModify(OrderTicket(),OrderOpenPrice(),0,0,0,CLR_NONE);
                 RefreshRates();
@@ -721,7 +786,7 @@ void control_Ngrid_order(){
             return(0);
          }   
       }
-      return(0);
+      
    }
    
    for(int x2=0; x2<tt_order; x2++)
@@ -743,6 +808,8 @@ void control_Ngrid_order(){
             }
           }
    }    
+   
+   return( 0 );
    //----------------------------------
 }
 
@@ -750,7 +817,7 @@ void control_Ngrid_order(){
 //| Controll and set all Take Profit and StopLoss                    |
 //| for trailing; safe; stealth mode                                 | 
 //+------------------------------------------------------------------+
-void control_opened_order(){
+int control_opened_order(){
 
    if(tt_pgrid_opened>0 || tt_ngrid_opened>0)return(0);
    
@@ -824,13 +891,13 @@ void control_opened_order(){
       //end control for manual/auto opened---------
    } 
    //----------------------------------
-   
+   return( 0 );
 }
 
 //+------------------------------------------------------------------+
 //| Controll if close position in stealth mode                       |
 //+------------------------------------------------------------------+
-void control_close_order(){
+int control_close_order(){
 
    if(tt_pgrid_opened>0 || tt_ngrid_opened>0)return(0);
    
@@ -908,6 +975,8 @@ void control_close_order(){
       }
       //end control for manual/auto opened---------
    } 
+   
+   return( 0 );
    //----------------------------------
 }
 
@@ -917,7 +986,7 @@ void control_close_order(){
 //+------------------------------------------------------------------+
 //| Create, delete or refresh Box layout and value                   |
 //+------------------------------------------------------------------+
-void create_box(){
+int create_box(){
 
    if(!Show_Box_Information)return(0);
    
@@ -952,7 +1021,7 @@ void create_box(){
       ObjectSet    (RealName_EA+" "+lb_2_field, OBJPROP_CORNER, 1);  
       ObjectSet    (RealName_EA+" "+lb_2_field, OBJPROP_XDISTANCE, Box_X+50);
       ObjectSet    (RealName_EA+" "+lb_2_field, OBJPROP_YDISTANCE, Box_Y+35);
-      ObjectSetText(RealName_EA+" "+lb_2_field,"Default Lot :",Car_Box_size, Car_Box_font, Color_Box_font);
+      ObjectSetText(RealName_EA+" "+lb_2_field,"Lots :",Car_Box_size, Car_Box_font, Color_Box_font);
    }  
    if (ObjectFind(RealName_EA+" "+lb_2_value) < 0) {
       ObjectCreate (RealName_EA+" "+lb_2_value, OBJ_LABEL,0, 0, 0);
@@ -1142,6 +1211,9 @@ void create_box(){
       ObjectSet    (RealName_EA+" "+lb_15_value, OBJPROP_YDISTANCE, Box_Y+250);
       ObjectSetText(RealName_EA+" "+lb_15_value,default_value,Car_Box_size, Car_Box_font, Color_Box_font_value);
    } 
+   
+   return( 0 );
+   
 }
 
 void delete_box(){
@@ -1222,7 +1294,7 @@ void refresh_box(){
    }
    switch(control_Ngrid_status()){
       case 0: NGrid_status="Disabled"; break;
-      case 1: NGrid_status=NGrid+"/"+NGrid_Max+"/"+NGrid_Multiplier+"/"+DoubleToStr(NGrid_Increment,3); break;
+      case 1: NGrid_status=NGrid+"/"+NGrid_Max+"/"+NGrid_Multiplier+"/"+DoubleToStr(nextSize,3); break;
       case 2: NGrid_status="Ignored"; break;
    }
    switch(control_Safe_status()){
@@ -1238,7 +1310,7 @@ void refresh_box(){
    
    
    if (ObjectFind(RealName_EA+" "+lb_1_value) >= 0)ObjectSetText(RealName_EA+" "+lb_1_value,spread+" ("+DoubleToStr(Max_Spread,2)+")",Car_Box_size, Car_Box_font, Color_Box_font_value);
-   if (ObjectFind(RealName_EA+" "+lb_2_value) >= 0)ObjectSetText(RealName_EA+" "+lb_2_value,DoubleToStr(Default_Lot,3),Car_Box_size, Car_Box_font, Color_Box_font_value);
+   if (ObjectFind(RealName_EA+" "+lb_2_value) >= 0)ObjectSetText(RealName_EA+" "+lb_2_value,DoubleToStr(nextSize,3),Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_3_value) >= 0)ObjectSetText(RealName_EA+" "+lb_3_value,Stealth_status,Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_5_value) >= 0)ObjectSetText(RealName_EA+" "+lb_5_value,HL_1,Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_6_value) >= 0)ObjectSetText(RealName_EA+" "+lb_6_value,HL_2,Car_Box_size, Car_Box_font, Color_Box_font_value);
@@ -1274,7 +1346,7 @@ bool control_HL(){
 //+------------------------------------------------------------------+
 //| Open order manual                                                |     
 //+------------------------------------------------------------------+
-void open_manual_mode(){
+int open_manual_mode(){
 
    if(control_H_Line_status()!=1)return(0); 
      
@@ -1291,7 +1363,8 @@ void open_manual_mode(){
             if(ObjectFind(HL_BUY_OVER_Name) >= 0)return(0);
             remove_all_HL_for_open();
             
-            result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
+            nextSize = getSize();
+            result=OrderSend(Symbol(),OP_BUY,nextSize,Ask,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
                Alert("SVEA Error open manual, "+GetLastError());
             }
@@ -1310,7 +1383,8 @@ void open_manual_mode(){
             if(ObjectFind(HL_BUY_UNDER_Name) >= 0)return(0);
             remove_all_HL_for_open();
             
-            result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
+            nextSize = getSize();
+            result=OrderSend(Symbol(),OP_BUY,nextSize,Ask,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
                Alert("SVEA Error open manual, "+GetLastError());
             }
@@ -1328,8 +1402,9 @@ void open_manual_mode(){
          
             if(ObjectFind(HL_SELL_OVER_Name) >= 0)return(0);
             remove_all_HL_for_open();
-         
-            result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
+            
+            nextSize = getSize();
+            result=OrderSend(Symbol(),OP_SELL,nextSize,Bid,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
                Alert("SVEA Error open manual, "+GetLastError());
             }
@@ -1348,7 +1423,8 @@ void open_manual_mode(){
             if(ObjectFind(HL_SELL_UNDER_Name) >= 0)return(0);
             remove_all_HL_for_open();
             
-            result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
+            nextSize = getSize();
+            result=OrderSend(Symbol(),OP_SELL,nextSize,Bid,Slippage,0,0,Comment_Open_Manual,Magic_Number,0,CLR_NONE);
             if(result<0){
                Alert("SVEA Error open manual, "+GetLastError());
             }
@@ -1356,14 +1432,14 @@ void open_manual_mode(){
          }
       }
    }
-   
+   return( 0 );
 }
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
 //| Open order auto                                                  |     
 //+------------------------------------------------------------------+
-void open_auto_mode(){
+int open_auto_mode(){
 
    if(control_automatic_status()!=1)return(0);
    
@@ -1375,8 +1451,8 @@ void open_auto_mode(){
    double   I_Force        =  iForce      (Symbol(),IForce_TimeFrame,IForce_Period,IForce_Method,IForce_Price,IForce_Shift);
    double   I_Rsi          =  iRSI        (Symbol(),IRSI_TimeFrame,IRSI_Period,IRSI_Price,IRSI_Shift);
    double   I_Stoch        =  iStochastic (Symbol(),IStochastic_TimeFrame,IStochastic_KPeriod,IStochastic_DPeriod,IStochastic_Slow,IStochastic_Method,IStochastic_Field,IStochastic_Mode,IStochastic_Shift);
-   double   I_MOM          =  iMomentum   (Symbol(),IMOM_TimeFrame,IMOM_Period,IMOM_Price,0);
-   double   I_MOM_old      =  iMomentum   (Symbol(),IMOM_TimeFrame,IMOM_Period,IMOM_Price,IMOM_Shift_For_Rising);
+   //double   I_MOM          =  iMomentum   (Symbol(),IMOM_TimeFrame,IMOM_Period,IMOM_Price,0);
+   //double   I_MOM_old      =  iMomentum   (Symbol(),IMOM_TimeFrame,IMOM_Period,IMOM_Price,IMOM_Shift_For_Rising);
    
    bool     I_Force_BUY    =  ((!IForce_logic_reverse && I_Force>=IForce_level_BUY) || (IForce_logic_reverse && I_Force<=IForce_level_SELL));
    bool     I_Force_SELL   =  ((!IForce_logic_reverse && I_Force<=IForce_level_SELL) || (IForce_logic_reverse && I_Force>=IForce_level_BUY));
@@ -1384,20 +1460,22 @@ void open_auto_mode(){
    bool     I_Rsi_SELL     =  ((!IRSI_logic_reverse && I_Rsi>=IRSI_level_SELL) || (IRSI_logic_reverse && I_Rsi<=IRSI_level_BUY));
    bool     I_Stoch_BUY    =  ((!IStoch_logic_reverse && I_Stoch<=IStochastic_level_BUY) || (IStoch_logic_reverse && I_Stoch>=IStochastic_level_SELL));
    bool     I_Stoch_SELL   =  ((!IStoch_logic_reverse && I_Stoch>=IStochastic_level_SELL) || (IStoch_logic_reverse && I_Stoch<=IStochastic_level_BUY));
-   int      I_MOM_Rising   =  0;          //1=rising; 2=not rising;
+   //int      I_MOM_Rising   =  0;          //1=rising; 2=not rising;
    
    bool     BUY_now        =  false;
    bool     SELL_now       =  false;
    
+   int      trendD = trendDirection();
+   
    int      result         =  0;
    
-   if(I_MOM_old<I_MOM){
+   /*if(I_MOM_old<I_MOM){
       I_MOM_Rising=1;
    }else if(I_MOM_old>I_MOM){
       I_MOM_Rising=2;
    }else{
       I_MOM_Rising=0;
-   }
+   }*/
    
    if(Signal_In_Combo){
       if(Use_Force_Index && Use_RSI && Use_Stochastic){
@@ -1433,8 +1511,9 @@ void open_auto_mode(){
    }
    
    
-   if((BUY_now) && ((Use_Momentum && I_MOM_Rising==1 && I_MOM<100) || !Use_Momentum)){
-      result=OrderSend(Symbol(),OP_BUY,Default_Lot,Ask,Slippage,0,0,Comment_Open_Auto,Magic_Number,0,CLR_NONE);
+   if((BUY_now) && (trendD == 0 || trendD == 1 )){
+      nextSize = getSize();
+      result=OrderSend(Symbol(),OP_BUY,nextSize,Ask,Slippage,0,0,Comment_Open_Auto,Magic_Number,0,CLR_NONE);
       if(result<0){
          Print("SVEA Error open buy Auto, "+GetLastError());
       }else{
@@ -1442,8 +1521,9 @@ void open_auto_mode(){
       }
       RefreshRates();
    
-   }else if((SELL_now) && ((Use_Momentum && I_MOM_Rising==2 && I_MOM>100) || !Use_Momentum)){
-      result=OrderSend(Symbol(),OP_SELL,Default_Lot,Bid,Slippage,0,0,Comment_Open_Auto,Magic_Number,0,CLR_NONE);
+   }else if((SELL_now) && (trendD == 0 || trendD == 2 )){
+      nextSize = getSize();
+      result=OrderSend(Symbol(),OP_SELL,nextSize,Bid,Slippage,0,0,Comment_Open_Auto,Magic_Number,0,CLR_NONE);
       if(result<0){
          Print("SVEA Error open sell Auto, "+GetLastError());
       }else{
@@ -1451,14 +1531,54 @@ void open_auto_mode(){
       }
       RefreshRates();
    }
+   return( 0 );
+}
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//| Check if Trend is up or down or disabled                         |     
+//+------------------------------------------------------------------+
+int trendDirection(){
+   
+   // Disabled
+   if( !Use_Momentum && !Use_SAR && !Use_ADX )return 0;
+   
+   double   I_MOM          =  iMomentum   (Symbol(),IMOM_TimeFrame,IMOM_Period,IMOM_Price,0);
+   double   I_MOM_old      =  iMomentum   (Symbol(),IMOM_TimeFrame,IMOM_Period,IMOM_Price,IMOM_Shift_For_Rising);
+   
+   bool     I_MOM_Rising   =  (I_MOM_old<I_MOM);
+   
+   double   I_SAR          =  iSAR(Symbol(),SAR_TimeFrame,SAR_Step,SAR_Maximum,SAR_Shift_For_Rising); 
+   
+   bool     I_SAR_Rising   =  I_SAR  < Close[SAR_Shift_For_Rising];
+   
+   double   ADXc           =  iADX(Symbol(),ADX_TimeFrame,ADX_Period,ADX_Price,MODE_MAIN,0);
+   double   ADXcOld        =  iADX(Symbol(),ADX_TimeFrame,ADX_Period,ADX_Price,MODE_MAIN,ADX_Shift_For_Signal);
+   
+   bool     ADXrising      =  (ADXcOld<ADXc && ADXc > ADX_Level);
+   
+   bool     ADXup          =  (iADX(Symbol(),ADX_TimeFrame,ADX_Period,ADX_Price,MODE_MINUSDI,ADX_Shift_For_Rising) < iADX(Symbol(),ADX_TimeFrame,ADX_Period,ADX_Price,MODE_PLUSDI,ADX_Shift_For_Rising));
+      
+   if( (I_MOM_Rising || !Use_Momentum)  && (I_SAR_Rising || !Use_SAR) && (ADXup || !Use_ADX) && ( ADXrising || !Use_ADX_Rising ) ){
+   
+      return 1; // Rising
+   
+   }else if( (!I_MOM_Rising || !Use_Momentum)  && (!I_SAR_Rising || !Use_SAR) && (!ADXup || !Use_ADX) && ( ADXrising || !Use_ADX_Rising ) ){
+      
+      return 2; // Not Rising
+      
+   }
+   
+   return -1; // Not good
 
 }
+
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
 //| Controll close manual with H-line                                |     
 //+------------------------------------------------------------------+
-void close_manual(){
+int close_manual(){
    
    double value = 0.0;
    
@@ -1493,7 +1613,7 @@ void close_manual(){
       }
       
    }   
-
+   return( 0 );
 }
 //+------------------------------------------------------------------+
 
@@ -1507,4 +1627,20 @@ void remove_all_HL_for_open(){
    ObjectDelete(HL_SELL_OVER_Name);
    ObjectDelete(HL_SELL_UNDER_Name);
 
+}
+
+//+------------------------------------------------------------------+
+//| get percentage size                                              |
+//+------------------------------------------------------------------+
+double getSize(){
+   
+   double riskMoney = ( AccountBalance() / 100 ) * Risk;
+   
+   double unitCost = MarketInfo( Symbol(), MODE_TICKVALUE );
+   double tickSize = MarketInfo( Symbol(), MODE_TICKSIZE );
+   
+   // Important for startup MT4, without generate an error
+   double ss = ( unitCost > 0 ) ? riskMoney / ( ( ( NormalizeDouble( Stop_Loss * MyPoint, Digits ) ) * unitCost ) / tickSize ) : MinLots ;  
+   return ( ss > MaxLots ) ? MaxLots : ss ;
+   
 }
