@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.03"
+#property version "2.04"
 #property strict
 
 enum __q{
@@ -46,6 +46,7 @@ extern int     Slippage                =  3;
 extern double  Take_Profit             =  100.0;                                                      // Take Profit
 extern double  Stop_Loss               =  30.0;                                                      // Stop Loss 
 extern __q     Show_Box_Information    =  Yes;                                                       // Show Box Information ? 
+extern __q     Show_Box_Debug          =  Yes;                                                       // Show Box Debug ?
 extern int     Box_X                   =  70;                                                        // Box Position X
 extern int     Box_Y                   =  70;                                                        // Box Position Y       
 extern color   Color_Title_font        =  Red;                                                       // Color Box Title 
@@ -74,6 +75,7 @@ extern string  Open_Automatic_start    =  "-------------------------------------
 extern __q     Open_Automatic          =  Yes;                                                       // Open Trade With Robot ?
 extern __q     Auto_Ignore_Max_Spread  =  No;                                                        // Robot Ignore Max Spread ?
 extern __q     Signal_In_Combo         =  No;                                                        // Robot Signal In Combination  ?
+extern __q     Use_Trend_For_Close     =  Yes;                                                       // Use Trend For Close Trades ?
 extern string  Space5                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_1        =  "--------------------------------------------------------";// ------- SETUP Automation Times Range
 extern __q     Trade_In_Friday         =  Yes;                                                       // Trade On Friday ?
@@ -889,7 +891,7 @@ int control_close_order(){
    double   stop_loss   =  get_SL_or_TP(0,0);
    double   take_profit =  get_SL_or_TP(0,1);  
    int      tt_order    =  OrdersTotal();
-   
+   int      tTrend      =  trendDirection();
    
    for(int i=0; i<tt_order; i++)
    {
@@ -898,6 +900,16 @@ int control_close_order(){
       //start control for manual/auto opened---------
       if(OrderComment()==Comment_Open_Manual || OrderComment()==Comment_Open_Auto){
          if(OrderType()==OP_BUY){
+            
+            if( Use_Trend_For_Close && tTrend == 2 ){
+            
+               RefreshRates();
+               bool aa=OrderClose(OrderTicket(),OrderLots(),Bid,Slippage,CLR_NONE);
+               if(!aa)Print("SVEA error, order not closed, error number "+GetLastError());
+               continue;
+            
+            }
+            
             if(control_Stealth_status()==1 && !(OrderStopLoss()>0.0) && !(OrderTakeProfit()>0.0)){
                if(control_Safe_status()==1 && Bid>=NormalizeDouble(OrderOpenPrice()+Safe_Trade_On*MyPoint,Digits)){
                   OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(OrderOpenPrice()+Safe_Trade_At*MyPoint,Digits),NormalizeDouble(OrderOpenPrice()+take_profit*MyPoint,Digits),0,CLR_NONE);
@@ -928,6 +940,16 @@ int control_close_order(){
             } 
          }
          if(OrderType()==OP_SELL){
+            
+            if( Use_Trend_For_Close && tTrend == 1 ){
+            
+               RefreshRates();
+               bool cc=OrderClose(OrderTicket(),OrderLots(),Ask,Slippage,CLR_NONE);
+               if(!cc)Print("SVEA error, order not closed, error number "+GetLastError());
+               continue;
+            
+            }
+            
             if(control_Stealth_status()==1 && !(OrderStopLoss()>0.0) && !(OrderTakeProfit()>0.0)){
                if(control_Safe_status()==1 && Ask<=NormalizeDouble(OrderOpenPrice()-Safe_Trade_On*MyPoint,Digits)){
                   OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(OrderOpenPrice()-Safe_Trade_At*MyPoint,Digits),NormalizeDouble(OrderOpenPrice()-take_profit*MyPoint,Digits),0,CLR_NONE);
@@ -1421,17 +1443,38 @@ int open_manual_mode(){
 }
 //+------------------------------------------------------------------+
 
+void _debug( string mex ){
+
+   if( Show_Box_Debug ){
+      
+      Comment( mex );
+      
+   }else{
+   
+      Comment("");
+   
+   }
+
+}
+
 //+------------------------------------------------------------------+
 //| Open order auto                                                  |     
 //+------------------------------------------------------------------+
 int open_auto_mode(){
-
-   if(control_automatic_status()!=1)return(0);
+   
+   int aStatus = control_automatic_status();
+   bool eExit = ( aStatus != 1);
+   string eLast = "Log information :\r\n" +
+                 "---------------------------------------\r\n\r\n";
+   
+   //if(control_automatic_status()!=1)return(0);
    
    if(current_spread()>NormalizeDouble(Max_Spread,2) && !Auto_Ignore_Max_Spread){
-      Print("SVEA "+Symbol()+", current spread is out of range, do not open Auto open!");
-      return(0);
+      eLast += "SVEA " + Symbol() + ", current spread is out of range, can't open Auto Mode!";
+      eExit = true;
    }
+   
+   if( !Show_Box_Debug && eExit )return(0);
    
    double   I_Force        =  iForce      (Symbol(),IForce_TimeFrame,IForce_Period,IForce_Method,IForce_Price,IForce_Shift);
    double   I_Rsi          =  iRSI        (Symbol(),IRSI_TimeFrame,IRSI_Period,IRSI_Price,IRSI_Shift);
@@ -1447,11 +1490,45 @@ int open_auto_mode(){
    bool     I_Stoch_SELL   =  ((!IStoch_logic_reverse && I_Stoch>=IStochastic_level_SELL) || (IStoch_logic_reverse && I_Stoch<=IStochastic_level_BUY));
    //int      I_MOM_Rising   =  0;          //1=rising; 2=not rising;
    
-   bool     BUY_now        =  false;
-   bool     SELL_now       =  false;
-   
    int      trendD = trendDirection();
+   string   tDir   = "Neutral";
    
+   switch( trendD ){
+      
+      case 0:
+         tDir = "Enable one indicator for trend";
+         break;
+      
+      case 1:
+         tDir = "Up";
+         break;
+         
+      case 2:
+         tDir = "Down";
+         break;
+         
+   } 
+   
+   string iInf = "\r\n\r\n\r\n\r\n\r\n" +
+                 "Trend is : " + tDir + "\r\n" +
+                 "---------------------------------------\r\n\r\n" +
+                 "Indicators Information :\r\n" +
+                 "---------------------------------------\r\n" +
+                 " - Force Index\r\n" +
+                 "    Time Frame : " + IForce_TimeFrame + " minutes;\r\n" +
+                 "    Value      : " + I_Force + "\r\n\r\n" +
+                 " - RSI\r\n" +
+                 "    Time Frame : " + IRSI_TimeFrame + " minutes;\r\n" +
+                 "    Value      : " + I_Rsi + "\r\n\r\n" +
+                 " - Stocastich\r\n" +
+                 "    Time Frame : " + IStochastic_TimeFrame + " minutes;\r\n" +
+                 "    Value      : " + I_Stoch + "\r\n\r\n";
+   
+   _debug( iInf + eLast );  
+   if( eExit )return(0);            
+      
+   bool     BUY_now        =  false;
+   bool     SELL_now       =  false;   
    int      result         =  0;
    
    /*if(I_MOM_old<I_MOM){
@@ -1487,7 +1564,7 @@ int open_auto_mode(){
       }
    }else{
       if((I_Force_BUY && Use_Force_Index) || (I_Rsi_BUY && Use_RSI) || (I_Stoch_BUY && Use_Stochastic))BUY_now=true;
-      if((I_Force_SELL && Use_Force_Index) || (I_Rsi_SELL && Use_RSI) || (I_Stoch_SELL &&Use_Stochastic))SELL_now=true;
+      if((I_Force_SELL && Use_Force_Index) || (I_Rsi_SELL && Use_RSI) || (I_Stoch_SELL && Use_Stochastic))SELL_now=true;
    }
    
    if(BUY_now && SELL_now){
