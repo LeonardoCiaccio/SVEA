@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.01"
+#property version "2.03"
 #property strict
 
 enum __q{
@@ -21,25 +21,10 @@ enum __q{
 
 };
 
-enum __tf{
-
-   cu    = 0,    // Current 
-   m1    = 1,    // 1 Minute
-   m5    = 5,    // 5 Minutes
-   m15   = 15,   // 15 Minutes
-   m30   = 30,   // 30 Minutes
-   h1    = 60,   // 1 Hour
-   h4    = 240,  // 4 Hours
-   d1    = 1440, // 1 Day
-   w1    = 10080,// 1 Week
-   mn1   = 43200 // 1 Month
-
-};
-
 enum __iSline{
 
-   main   = 0,      // Base Indicator Line
-   signal = 1       // Signal Line
+   main   = MODE_MAIN,      // Base Indicator Line
+   signal = MODE_SIGNAL     // Signal Line
 
 };
 
@@ -52,13 +37,13 @@ extern string  Donate_PayPal           =  "microlabs@altervista.org";           
 extern string  Space1                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Setup                   =  "--------------------------------------------------------";// ------- SETUP Information
 extern int     Magic_Number            =  173;                                                       // Magic Number ( ignore it )
-extern __q     Stealth_Mode            =  Yes;                                                       // Hide Information To Broker ?
-extern double  Max_Spread              =  2.5;                                                       // Max Spread Allowed 
-extern double  Risk                    =  5.0;                                                       // Percentage Risk For Trade
+extern __q     Stealth_Mode            =  No;                                                       // Hide Information To Broker ?
+extern double  Max_Spread              =  3.0;                                                       // Max Spread Allowed 
+extern double  Risk                    =  3.0;                                                       // Percentage Risk For Trade
 extern double  MinLots                 =  0.01;                                                      // Min Lots Allowed
-extern double  MaxLots                 =  5.0;                                                       // Max Lots Allowed
+extern double  MaxLots                 =  1.0;                                                       // Max Lots Allowed
 extern int     Slippage                =  3;
-extern double  Take_Profit             =  30.0;                                                      // Take Profit
+extern double  Take_Profit             =  100.0;                                                      // Take Profit
 extern double  Stop_Loss               =  30.0;                                                      // Stop Loss 
 extern __q     Show_Box_Information    =  Yes;                                                       // Show Box Information ? 
 extern int     Box_X                   =  70;                                                        // Box Position X
@@ -72,8 +57,8 @@ extern __q     Use_Safe_Trade          =  Yes;                                  
 extern double  Safe_Trade_On           =  10.0;                                                      // Active Safe-Trade On 
 extern double  Safe_Trade_At           =  1.0;                                                       // Close Trade With Safe-Trade At 
 extern __q     Use_Trailing            =  Yes;                                                       // Use Trailing ?
-extern double  Trailing_Start          =  20.0;                                                      // Active Trailing On 
-extern double  Trailing_For            =  10.0;                                                      // Move Trailing For 
+extern double  Trailing_Start          =  30.0;                                                      // Active Trailing On 
+extern double  Trailing_For            =  20.0;                                                      // Move Trailing For 
 extern __q     Trailing_Ignore_TP      =  Yes;                                                       // Trailing Ignore Take Profit ?
 extern string  Space3                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Manual_start       =  "--------------------------------------------------------";// ------- SETUP Manual Data
@@ -86,7 +71,7 @@ extern string  HL_CLOSE_OVER_Name      =  "CO";                                 
 extern string  HL_CLOSE_UNDER_Name     =  "CU";                                                      // Name For Close All Under H-Line
 extern string  Space4                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_start    =  "--------------------------------------------------------";// ------- SETUP Automation Flags
-extern __q     Open_Automatic          =  No;                                                        // Open Trade With Robot ?
+extern __q     Open_Automatic          =  Yes;                                                       // Open Trade With Robot ?
 extern __q     Auto_Ignore_Max_Spread  =  No;                                                        // Robot Ignore Max Spread ?
 extern __q     Signal_In_Combo         =  No;                                                        // Robot Signal In Combination  ?
 extern string  Space5                  =  "--------------------------------------------------------";// -----------------------------
@@ -101,7 +86,7 @@ extern string  Space6                  =  "-------------------------------------
 extern string  Open_Automatic_3        =  "--------------------------------------------------------";// ------- SETUP Automation Signals Force Index
 extern __q     Use_Force_Index         =  No;                                                        // Use Force Index ?
 extern __q     IForce_logic_reverse    =  No;                                                        // Use Reverse Logic ? 
-extern __tf    IForce_TimeFrame        =  m1;                                                        // Time Frame 
+extern ENUM_TIMEFRAMES    IForce_TimeFrame        =  PERIOD_M1;                                      // Time Frame 
 extern int     IForce_Period           =  1;                                                         // Period
 extern ENUM_MA_METHOD     IForce_Method           =  MODE_SMA;                                       // Method 
 extern ENUM_APPLIED_PRICE     IForce_Price        =  PRICE_CLOSE;                                    // Price 
@@ -112,7 +97,7 @@ extern string  Space7                  =  "-------------------------------------
 extern string  Open_Automatic_4        =  "--------------------------------------------------------";// ------- SETUP Automation Signals RSI
 extern __q     Use_RSI                 =  No;                                                        // Use RSI ? 
 extern __q     IRSI_logic_reverse      =  No;                                                        // Use Reverse Logic ?
-extern __tf    IRSI_TimeFrame          =  m1;                                                        // Time Frame 
+extern ENUM_TIMEFRAMES    IRSI_TimeFrame          =  PERIOD_M1;                                      // Time Frame 
 extern int     IRSI_Period             =  3;                                                         // Period 
 extern ENUM_APPLIED_PRICE     IRSI_Price          =  PRICE_CLOSE;                                    // Price 
 extern int     IRSI_Shift              =  0;                                                         // Shift Bars 
@@ -120,38 +105,38 @@ extern double  IRSI_level_BUY          =  5.0;                                  
 extern double  IRSI_level_SELL         =  95.0;                                                      // Level For Sell Signal 
 extern string  Space8                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_5        =  "--------------------------------------------------------";// ------- SETUP Automation Signals Stochastic
-extern __q     Use_Stochastic          =  No;                                                        // Use Stochastic ? 
+extern __q     Use_Stochastic          =  Yes;                                                       // Use Stochastic ? 
 extern __q     IStoch_logic_reverse    =  No;                                                        // Use Reverse Logic ?
-extern __tf    IStochastic_TimeFrame   =  m1;                                                        // Time Frame 
-extern int     IStochastic_KPeriod     =  5;                                                         // Period Of The %K Line 
+extern ENUM_TIMEFRAMES    IStochastic_TimeFrame   =  PERIOD_M5;                                      // Time Frame 
+extern int     IStochastic_KPeriod     =  20;                                                        // Period Of The %K Line 
 extern int     IStochastic_DPeriod     =  3;                                                         // Period Of The %D Line
 extern int     IStochastic_Slow        =  3;                                                         // Slowing value 
 extern ENUM_MA_METHOD     IStochastic_Method      =  MODE_SMA;                                       // Method
 extern int     IStochastic_Field       =  0;                                                         // Price Field ( 0 = Low/High; 1 = Close/Close ) 
 extern __iSline     IStochastic_Mode              =  signal;                                         // Mode       
-extern int     IStochastic_Shift       =  0;                                                         // Shift Bars 
-extern double  IStochastic_level_BUY   =  5.0;                                                       // Level For Buy Signal
-extern double  IStochastic_level_SELL  =  95.0;                                                      // Level For Sell Signal
+extern int     IStochastic_Shift       =  1;                                                         // Shift Bars 
+extern double  IStochastic_level_BUY   =  20.0;                                                      // Level For Buy Signal
+extern double  IStochastic_level_SELL  =  80.0;                                                      // Level For Sell Signal
 extern string  Space9                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_6        =  "--------------------------------------------------------";// ------- SETUP Trend Momentum
 extern __q     Use_Momentum            =  No;                                                        // Use Momentum For Trend ?
-extern __tf    IMOM_TimeFrame          =  m1;                                                        // Time Frame 
+extern ENUM_TIMEFRAMES    IMOM_TimeFrame          =  PERIOD_CURRENT;                                 // Time Frame 
 extern int     IMOM_Period             =  89;                                                        // Period
 extern ENUM_APPLIED_PRICE     IMOM_Price          =  PRICE_CLOSE;                                    // Price                                                          
 extern int     IMOM_Shift_For_Rising   =  14;                                                        // Shift Bars For Direction
 extern string  Space10                 =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_7        =  "--------------------------------------------------------";// ------- SETUP Trend SAR
-extern __q     Use_SAR                 =  No;                                                        // Use SAR For Trend ?
-extern __tf    SAR_TimeFrame           =  m1;                                                        // Time Frame
+extern __q     Use_SAR                 =  Yes;                                                       // Use SAR For Trend ?
+extern ENUM_TIMEFRAMES    SAR_TimeFrame           =  PERIOD_H1;                                      // Time Frame
 extern double  SAR_Step                =  0.02;                                                      // Step
 extern double  SAR_Maximum             =  0.2;                                                       // Maximum                                          
 extern int     SAR_Shift_For_Rising    =  0;                                                         // Shift Bars
 extern string  Space11                 =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_8        =  "--------------------------------------------------------";// ------- SETUP Direction ADX
-extern __q     Use_ADX                 =  No;                                                        // Use ADX For Direction ?
-extern __q     Use_ADX_Rising          =  Yes;                                                       // Use ADX Rising ?
+extern __q     Use_ADX                 =  Yes;                                                       // Use ADX For Direction ?
+extern __q     Use_ADX_Rising          =  No;                                                        // Use ADX Rising ?
 extern int     ADX_Shift_For_Signal    =  7;                                                         // Shift Bars For Rising
-extern __tf    ADX_TimeFrame           =  m1;                                                        // Time Frame
+extern ENUM_TIMEFRAMES    ADX_TimeFrame           =  PERIOD_H1;                                      // Time Frame
 extern int     ADX_Period              =  14;                                                        // Period
 extern ENUM_APPLIED_PRICE     ADX_Price           =  PRICE_CLOSE;                                    // Price
 extern int     ADX_Shift_For_Rising    =  0;                                                         // Shift Bars For Cross
@@ -159,9 +144,9 @@ extern double  ADX_Level               =  18.00;                                
 extern string  Space12                 =  "--------------------------------------------------------";// -----------------------------
 extern string  Close_Strategy_start    =  "--------------------------------------------------------";// ------- SETUP Close Strategy Positive Grid
 extern __q     Use_Positive_Grid       =  No;                                                        // Use Positive Grid ?
-extern int     PGrid                   =  25;                                                        // Grid Size In Pips       
+extern int     PGrid                   =  30;                                                        // Grid Size In Pips       
 extern int     PGrid_Max               =  1;                                                         // Number Of Grids
-extern int     PGrid_Stop              =  10;                                                        // Pips For Safe Stop
+extern int     PGrid_Stop              =  15;                                                        // Pips For Safe Stop
 extern string  Space13                 =  "--------------------------------------------------------";// -----------------------------
 extern string  Close_Strategy_start2   =  "--------------------------------------------------------";// ------- SETUP Close Strategy Negative Grid
 extern __q     Use_Negative_Grid       =  No;                                                        // Use Negative Grid ?
