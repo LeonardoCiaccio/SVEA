@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.04"
+#property version "2.05"
 #property strict
 
 enum __q{
@@ -1703,6 +1703,6 @@ double getSize(){
    
    // Important for startup MT4, without generate an error
    double ss = ( unitCost > 0 ) ? riskMoney / ( ( ( NormalizeDouble( Stop_Loss * MyPoint, Digits ) ) * unitCost ) / tickSize ) : MinLots ;  
-   return ( ss > MaxLots ) ? MaxLots : ss ;
+   return ( ss > MaxLots ) ? MaxLots : ( ss < MinLots ) ? MinLots : ss ;
    
 }
