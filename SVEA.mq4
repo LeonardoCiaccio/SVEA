@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.06"
+#property version "2.07"
 #property strict
 
 enum __q{
@@ -25,6 +25,15 @@ enum __iSline{
 
    main   = MODE_MAIN,      // Base Indicator Line
    signal = MODE_SIGNAL     // Signal Line
+
+};
+
+enum __dT{
+
+   
+   dM = 1,   // Use Only For SVEA (all symbols)
+   dS = 2,   // Use Only For This Symbol (all chart)
+   dA = 3    // Use For All
 
 };
 
@@ -77,6 +86,11 @@ extern __q     Auto_Ignore_Max_Spread  =  No;                                   
 extern __q     Signal_In_Combo         =  No;                                                        // Robot Signal In Combination  ?
 extern __q     Use_Trend_For_Close     =  Yes;                                                       // Use Trend For Close Trades ?
 extern string  Space5                  =  "--------------------------------------------------------";// -----------------------------
+extern string  DayPrice                =  "--------------------------------------------------------";// ------- SETUP Money Target
+extern __q     Use_Day_Target          =  No;                                                        // Use Money Target ?
+extern __dT    DayTarget               =  dA;                                                        // How Apply ?
+extern double  Day_Target_Money        =  50;                                                        // Money Target 
+extern string  Space5x                 =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_1        =  "--------------------------------------------------------";// ------- SETUP Automation Times Range
 extern __q     Trade_In_Friday         =  Yes;                                                       // Trade On Friday ?
 extern __q     Use_Trade_Time          =  No;                                                        // Use Times Range ?
@@ -499,6 +513,45 @@ double get_SL_or_TP(int type_order, int type_value){
         break;
    default: return(-1);
   }
+}
+
+//+------------------------------------------------------------------+
+//| Total profit                                                     |
+//+------------------------------------------------------------------+
+double total_profit_all(){
+   
+   double tt_profit  =  0.0;
+   /*
+         dM = 1,   // Use Only For SVEA (all symbols)
+         dS = 2,   // Use Only For This Symbol (all chart)
+         dA = 3    // Use For All
+   */
+   for(int x=0; x<OrdersTotal(); x++)
+   {
+       if( !OrderSelect( x, SELECT_BY_POS, MODE_TRADES ) )continue;
+       
+       switch(DayTarget){
+       
+         case dM:
+            
+            if( OrderMagicNumber() == Magic_Number )tt_profit+=OrderProfit();
+            break;
+            
+         case dS:
+            
+            if( OrderSymbol() == My_Symbol )tt_profit+=OrderProfit();            
+            break;
+            
+         case dA:
+            
+            tt_profit+=OrderProfit();
+            break;
+       
+       }
+       
+   }
+   
+   return(tt_profit);
 }
 
 //+------------------------------------------------------------------+
@@ -1315,6 +1368,7 @@ void refresh_box(){
       case 2: Trailing_status="Ignored"; break;
    }
    
+   double ttA = total_profit_all();
    
    if (ObjectFind(RealName_EA+" "+lb_1_value) >= 0)ObjectSetText(RealName_EA+" "+lb_1_value,spread+" ("+DoubleToStr(Max_Spread,2)+")",Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_2_value) >= 0)ObjectSetText(RealName_EA+" "+lb_2_value,DoubleToStr(nextSize,3),Car_Box_size, Car_Box_font, Color_Box_font_value);
@@ -1329,7 +1383,7 @@ void refresh_box(){
    if (ObjectFind(RealName_EA+" "+lb_12_value) >= 0)ObjectSetText(RealName_EA+" "+lb_12_value,Safe_status,Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_13_value) >= 0)ObjectSetText(RealName_EA+" "+lb_13_value,Trailing_status,Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_14_value) >= 0)ObjectSetText(RealName_EA+" "+lb_14_value,DoubleToStr(Take_Profit,0)+"/"+DoubleToStr(Stop_Loss,0),Car_Box_size, Car_Box_font, Color_Box_font_value);
-   if (ObjectFind(RealName_EA+" "+lb_15_value) >= 0)ObjectSetText(RealName_EA+" "+lb_15_value,DoubleToStr(My_tt_profit, 2),Car_Box_size, Car_Box_font, Color_Box_font_value);
+   if (ObjectFind(RealName_EA+" "+lb_15_value) >= 0)ObjectSetText(RealName_EA+" "+lb_15_value,DoubleToStr(My_tt_profit, 2)+"("+DoubleToStr(ttA, 2)+")",Car_Box_size, Car_Box_font, Color_Box_font_value);
    
 
 }
@@ -1643,6 +1697,20 @@ int trendDirection(){
 int close_manual(){
    
    double value = 0.0;
+   
+   if( Use_Day_Target ){
+   
+      double ttA = total_profit_all();
+      
+      if( ttA > Day_Target_Money ){
+      
+         close_all_order();
+         Alert( "SVEA Day target hit " + ttA );
+         return( 0 );
+      
+      }
+   
+   }
    
    if(ObjectFind(HL_CLOSE_OVER_Name) >= 0){
    
