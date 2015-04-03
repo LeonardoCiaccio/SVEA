@@ -572,6 +572,75 @@ double total_profit(){
    return(tt_profit);
 }
 
+void close_all_target_order(){
+   
+   int conta=0;
+   double price;
+   int cmd;
+   int error=0;
+   bool esegui=true;
+   bool result=false;
+   int contaCicli=0;
+   int TimeOut_Cicli=1000;
+   
+   while(esegui && contaCicli<=TimeOut_Cicli){
+      esegui=false;
+      for(int cnt=0;cnt<OrdersTotal();cnt++)
+      {
+       if(!OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES))continue;
+       
+       switch(DayTarget){
+       
+         case dM:
+            
+            if( OrderMagicNumber() == Magic_Number ){
+            
+                esegui=true;
+                cmd=OrderType();
+                if(cmd==OP_BUY) price=MarketInfo(OrderSymbol(),MODE_BID);
+                else            price=MarketInfo(OrderSymbol(),MODE_ASK);
+               
+                result=OrderClose(OrderTicket(),OrderLots(),price,0,CLR_NONE);
+            
+            }
+            break;
+            
+         case dS:
+            
+            if( OrderSymbol() == My_Symbol ){
+            
+               esegui=true;
+               cmd=OrderType();
+               if(cmd==OP_BUY) price=MarketInfo(OrderSymbol(),MODE_BID);
+               else            price=MarketInfo(OrderSymbol(),MODE_ASK);
+               
+               result=OrderClose(OrderTicket(),OrderLots(),price,0,CLR_NONE);
+            
+            }            
+            break;
+            
+         case dA:
+            
+            esegui=true;
+            cmd=OrderType();
+            if(cmd==OP_BUY) price=MarketInfo(OrderSymbol(),MODE_BID);
+            else            price=MarketInfo(OrderSymbol(),MODE_ASK);
+               
+            result=OrderClose(OrderTicket(),OrderLots(),price,0,CLR_NONE);
+            break;
+       
+       }
+       
+       error=GetLastError();
+       if(error==135)RefreshRates();
+          
+      }
+   contaCicli++;    
+  }
+  
+  if(contaCicli>=TimeOut_Cicli)Print("SVEA error close all, timeout");
+}
+
 //+------------------------------------------------------------------+
 //| Close all order                                                  |
 //+------------------------------------------------------------------+
@@ -1704,7 +1773,7 @@ int close_manual(){
       
       if( ttA > Day_Target_Money ){
       
-         close_all_order();
+         close_all_target_order();
          Alert( "SVEA Day target hit " + ttA );
          return( 0 );
       
