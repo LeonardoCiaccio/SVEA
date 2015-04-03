@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.05"
+#property version "2.06"
 #property strict
 
 enum __q{
@@ -164,7 +164,7 @@ extern double  NGrid_over_TP_In_Money  =  0.0;                                  
 //| Common                                                           |
 //+------------------------------------------------------------------+
 string RealName_EA         =  "SVEA";
-string RealVersion_EA      =  "1.0.4";
+string RealVersion_EA      =  "";
 string Real_Email          =  "leonardo.ciaccio@gmail.com";
 string Comment_Open_Manual =  "SVEA Opened with H. Line";
 string Comment_Open_Auto   =  "SVEA Opened with Signal";
@@ -213,9 +213,9 @@ string lb_14_value         =  "Box 14 value";
 string lb_15_field         =  "Box 15 field";
 string lb_15_value         =  "Box 15 value";
 
-string Car_Box_Title_font  =  "Tahoma Bold";
-int    Car_Box_Title_size  =  10;
-string Car_Box_font        =  "Tahoma Bold";
+string Car_Box_Title_font  =  "Tahoma";
+int    Car_Box_Title_size  =  14;
+string Car_Box_font        =  "Tahoma";
 int    Car_Box_size        =  8;
 
 //+------------------------------------------------------------------+
