@@ -1771,7 +1771,7 @@ int close_manual(){
    
       double ttA = total_profit_all();
       
-      if( ttA > Day_Target_Money ){
+      if( ttA > Day_Target_Money && ttA != 0 ){
       
          close_all_target_order();
          Alert( "SVEA Day target hit " + ttA );
