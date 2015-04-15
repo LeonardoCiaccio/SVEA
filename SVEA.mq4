@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.07"
+#property version "2.08"
 #property strict
 
 enum __q{
@@ -46,13 +46,13 @@ extern string  Donate_PayPal           =  "microlabs@altervista.org";           
 extern string  Space1                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Setup                   =  "--------------------------------------------------------";// ------- SETUP Information
 extern int     Magic_Number            =  173;                                                       // Magic Number ( ignore it )
-extern __q     Stealth_Mode            =  No;                                                       // Hide Information To Broker ?
+extern __q     Stealth_Mode            =  No;                                                        // Hide Information To Broker ?
 extern double  Max_Spread              =  3.0;                                                       // Max Spread Allowed 
 extern double  Risk                    =  3.0;                                                       // Percentage Risk For Trade
 extern double  MinLots                 =  0.01;                                                      // Min Lots Allowed
 extern double  MaxLots                 =  1.0;                                                       // Max Lots Allowed
 extern int     Slippage                =  3;
-extern double  Take_Profit             =  100.0;                                                      // Take Profit
+extern double  Take_Profit             =  100.0;                                                     // Take Profit
 extern double  Stop_Loss               =  30.0;                                                      // Stop Loss 
 extern __q     Show_Box_Information    =  Yes;                                                       // Show Box Information ? 
 extern __q     Show_Box_Debug          =  Yes;                                                       // Show Box Debug ?
@@ -263,13 +263,7 @@ int deinit()
 int start()
   {
 //----
-   if(!IsTesting()){
-      if(!IsConnected()){
-         Comment("SVEA error, check your connection....");
-         return(0);
-      }
-   }
-   
+      
    close_manual();
    
    refresh_global_data();
