@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.08"
+#property version "2.09"
 #property strict
 
 enum __q{
@@ -1434,7 +1434,7 @@ void refresh_box(){
    double ttA = total_profit_all();
    
    if (ObjectFind(RealName_EA+" "+lb_1_value) >= 0)ObjectSetText(RealName_EA+" "+lb_1_value,spread+" ("+DoubleToStr(Max_Spread,2)+")",Car_Box_size, Car_Box_font, Color_Box_font_value);
-   if (ObjectFind(RealName_EA+" "+lb_2_value) >= 0)ObjectSetText(RealName_EA+" "+lb_2_value,DoubleToStr(nextSize,3),Car_Box_size, Car_Box_font, Color_Box_font_value);
+   if (ObjectFind(RealName_EA+" "+lb_2_value) >= 0)ObjectSetText(RealName_EA+" "+lb_2_value,DoubleToStr(nextSize,3)+" ("+ DoubleToStr(Risk,2) +"%)",Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_3_value) >= 0)ObjectSetText(RealName_EA+" "+lb_3_value,Stealth_status,Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_5_value) >= 0)ObjectSetText(RealName_EA+" "+lb_5_value,HL_1,Car_Box_size, Car_Box_font, Color_Box_font_value);
    if (ObjectFind(RealName_EA+" "+lb_6_value) >= 0)ObjectSetText(RealName_EA+" "+lb_6_value,HL_2,Car_Box_size, Car_Box_font, Color_Box_font_value);
