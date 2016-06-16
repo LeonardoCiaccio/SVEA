@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2015, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.09"
+#property version "2.10"
 #property strict
 
 enum __q{
@@ -1482,6 +1482,7 @@ int open_manual_mode(){
       if(value>0.0 && Ask>value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
+            ObjectDelete(HL_BUY_OVER_Name); // Self remove this open order
          }else if(ObjectDelete(HL_BUY_OVER_Name)){
          
             if(ObjectFind(HL_BUY_OVER_Name) >= 0)return(0);
@@ -1502,6 +1503,7 @@ int open_manual_mode(){
       if(value>0.0 && Ask<value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
+            ObjectDelete(HL_BUY_UNDER_Name); // Self remove this open order
          }else if(ObjectDelete(HL_BUY_UNDER_Name)){
          
             if(ObjectFind(HL_BUY_UNDER_Name) >= 0)return(0);
@@ -1522,6 +1524,7 @@ int open_manual_mode(){
       if(value>0.0 && Bid>value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
+            ObjectDelete(HL_SELL_OVER_Name); // Self remove this open order
          }else if(ObjectDelete(HL_SELL_OVER_Name)){
          
             if(ObjectFind(HL_SELL_OVER_Name) >= 0)return(0);
@@ -1542,6 +1545,7 @@ int open_manual_mode(){
       if(value>0.0 && Bid<value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
+            ObjectDelete(HL_SELL_UNDER_Name); // Self remove this open order
          }else if(ObjectDelete(HL_SELL_UNDER_Name)){
          
             if(ObjectFind(HL_SELL_UNDER_Name) >= 0)return(0);
