@@ -8,10 +8,10 @@
 //+------------------------------------------------------------------+
 
 
-#property copyright "Copyright © 2015, Leonardo Ciaccio"
+#property copyright "Copyright © 2016, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.10"
+#property version "2.20"
 #property strict
 
 enum __q{
@@ -35,6 +35,15 @@ enum __dT{
    dS = 2,   // Use Only For This Symbol (all chart)
    dA = 3    // Use For All
 
+};
+
+enum __cHL{
+
+   
+   cuHL  = -1,   // Close under HL
+   cEmp  = 0,    // No position
+   coHL  = 1     // Close over HL
+   
 };
 
 extern string  Info                    =  "--------------------------------------------------------";// ------- SVEA INFORMATION
@@ -73,12 +82,14 @@ extern __q     Trailing_Ignore_TP      =  Yes;                                  
 extern string  Space3                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Manual_start       =  "--------------------------------------------------------";// ------- SETUP Manual Data
 extern __q     Ignore_Max_Spread       =  No;                                                        // Manual Ignore Max Spread ?
-extern string  HL_BUY_OVER_Name        =  "BO";                                                      // Name For Buy Over H-Line 
-extern string  HL_BUY_UNDER_Name       =  "BU";                                                      // Name For Buy Under H-Line
-extern string  HL_SELL_OVER_Name       =  "SO";                                                      // Name For Sell Over H-Line
-extern string  HL_SELL_UNDER_Name      =  "SU";                                                      // Name For Sell Under H-Line
+extern string  HL_BUY_OVER_Name        =  "BO";                                                      // Name For Buy Over H-Line ( Buy Stop ) 
+extern string  HL_BUY_UNDER_Name       =  "BU";                                                      // Name For Buy Under H-Line ( Buy Limit )
+extern string  HL_SELL_OVER_Name       =  "SO";                                                      // Name For Sell Over H-Line ( Sell Limit )
+extern string  HL_SELL_UNDER_Name      =  "SU";                                                      // Name For Sell Under H-Line ( Sell Stop )
 extern string  HL_CLOSE_OVER_Name      =  "CO";                                                      // Name For Close All Over H-Line
 extern string  HL_CLOSE_UNDER_Name     =  "CU";                                                      // Name For Close All Under H-Line
+extern string  HL_CLOSE_PAS_Name       =  "CAS";                                                     // Name For Close All With Slow Price Action
+extern string  HL_CLOSE_PAF_Name       =  "CAF";                                                     // Name For Close All With Fast Price Action
 extern string  Space4                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Automatic_start    =  "--------------------------------------------------------";// ------- SETUP Automation Flags
 extern __q     Open_Automatic          =  Yes;                                                       // Open Trade With Robot ?
@@ -173,7 +184,6 @@ extern double  NGrid_1_TP_In_Money     =  0.0;                                  
 extern double  NGrid_2_TP_In_Money     =  0.0;                                                       // Take Profit In Money For 2° Grid
 extern double  NGrid_3_TP_In_Money     =  0.0;                                                       // Take Profit In Money For 3° Grid
 extern double  NGrid_over_TP_In_Money  =  0.0;                                                       // Take Profit In Money For Other
-
 //+------------------------------------------------------------------+
 //| Common                                                           |
 //+------------------------------------------------------------------+
@@ -194,6 +204,11 @@ int    tt_manual_opened    =  0;
 int    tt_auto_opened      =  0;
 int    tt_pgrid_opened     =  0;
 int    tt_ngrid_opened     =  0;
+
+__cHL  signedSL            =  cEmp;
+__cHL  signedSL2           =  cEmp;
+double signedValueSL       =  0.0;
+
 //+------------------------------------------------------------------+
 //| Box - label define name and setting                              |
 //+------------------------------------------------------------------+
@@ -997,6 +1012,7 @@ int control_opened_order(){
    return( 0 );
 }
 
+
 //+------------------------------------------------------------------+
 //| Controll if close position in stealth mode                       |
 //+------------------------------------------------------------------+
@@ -1021,7 +1037,7 @@ int control_close_order(){
             
                RefreshRates();
                bool aa=OrderClose(OrderTicket(),OrderLots(),Bid,Slippage,CLR_NONE);
-               if(!aa)Print("SVEA error, order not closed, error number "+GetLastError());
+               if(!aa)Print("SVEA error, order not closed with trend, error number "+GetLastError());
                continue;
             
             }
@@ -1056,7 +1072,7 @@ int control_close_order(){
             } 
          }
          if(OrderType()==OP_SELL){
-            
+                      
             if( Use_Trend_For_Close && tTrend == 1 ){
             
                RefreshRates();
@@ -1773,6 +1789,7 @@ int close_manual(){
       
          close_all_target_order();
          Alert( "SVEA Day target hit " + ttA );
+         remove_all_HL_for_close();
          return( 0 );
       
       }
@@ -1789,12 +1806,15 @@ int close_manual(){
             if(ObjectFind(HL_CLOSE_OVER_Name) >= 0)return(0);
             
             close_all_order();
-          
+            remove_all_HL_for_close();
+            
          }
          
       }
    
-   }else if(ObjectFind(HL_CLOSE_UNDER_Name) >= 0){
+   }
+   
+   if(ObjectFind(HL_CLOSE_UNDER_Name) >= 0){
    
       value=ObjectGet(HL_CLOSE_UNDER_Name, OBJPROP_PRICE1);
       if(value>0.0 && Bid<value){
@@ -1804,12 +1824,137 @@ int close_manual(){
             if(ObjectFind(HL_CLOSE_UNDER_Name) >= 0)return(0);
             
             close_all_order();
+            remove_all_HL_for_close();
           
          }
          
       }
       
+   }
+   
+   if(ObjectFind(HL_CLOSE_PAS_Name) >= 0){
+   
+      value=ObjectGet(HL_CLOSE_PAS_Name, OBJPROP_PRICE1);
+      
+      // First of all check position and direction
+      if( value > 0.0 ){
+         
+         if( signedSL != cEmp ){
+         
+            // Close ?
+            if( ( Bid < value && signedSL == cuHL ) || ( Ask > value && signedSL == coHL ) ){
+         
+               if(ObjectDelete(HL_CLOSE_PAS_Name)){
+                  
+                  if(ObjectFind(HL_CLOSE_PAS_Name) >= 0)return(0);
+                  
+                  signedSL = cEmp;
+                  signedValueSL = 0.0;
+                  close_all_order();
+                  remove_all_HL_for_close();
+                
+               }
+               
+            }else{//Update position with price action
+            
+               
+               switch( signedSL ){
+               
+                  case cuHL:
+                     
+                     signedValueSL = ( High[ 0 ] > signedValueSL || signedValueSL == 0.0 ) ? High[ 0 ] : signedValueSL;
+                     if( High[ 0 ] > High[ 1 ] && Low[ 1 ] > value && High[ 0 ] >= signedValueSL ){
+                     
+                        ObjectSet( HL_CLOSE_PAS_Name, OBJPROP_PRICE1, Low[ 1 ] );
+                          
+                     }
+                     break;
+                     
+                  case coHL:
+                     
+                     signedValueSL = ( Low[ 0 ] < signedValueSL || signedValueSL == 0.0 ) ? Low[ 0 ] : signedValueSL;
+                     if( Low[ 0 ] < Low[ 1 ] && High[ 1 ] < value && Low[ 0 ] <= signedValueSL ){
+                     
+                        ObjectSet( HL_CLOSE_PAS_Name, OBJPROP_PRICE1, High[ 1 ] );
+                        
+                        
+                     }
+                     break;
+               
+               }
+            
+            }  
+         
+         }else{
+         
+            signedSL = ( Bid > value ) ? cuHL : ( Ask < value ) ? coHL : cEmp ;
+         
+         } 
+      
+      }   
+      
    }   
+   
+   if(ObjectFind(HL_CLOSE_PAF_Name) >= 0){
+   
+      value=ObjectGet(HL_CLOSE_PAF_Name, OBJPROP_PRICE1);
+      
+      // First of all check position and direction
+      if( value > 0.0 ){
+         
+         if( signedSL2 != cEmp ){
+         
+            // Close ?
+            if( ( Bid < value && signedSL2 == cuHL ) || ( Ask > value && signedSL2 == coHL ) ){
+         
+               if(ObjectDelete(HL_CLOSE_PAF_Name)){
+                  
+                  if(ObjectFind(HL_CLOSE_PAF_Name) >= 0)return(0);
+                  
+                  signedSL2 = cEmp;
+                  close_all_order();
+                  remove_all_HL_for_close();
+                
+               }
+               
+            }else{//Update position with price action
+            
+               
+               switch( signedSL2 ){
+               
+                  case cuHL:
+                     
+                     if( High[ 0 ] > High[ 1 ] && Low[ 1 ] < Bid  ){
+                     
+                        ObjectSet( HL_CLOSE_PAF_Name, OBJPROP_PRICE1, Low[ 1 ] );
+                          
+                     }
+                     break;
+                     
+                  case coHL:
+                     
+                     
+                     if( Low[ 0 ] < Low[ 1 ] && High[ 1 ] > Ask ){
+                     
+                        ObjectSet( HL_CLOSE_PAF_Name, OBJPROP_PRICE1, High[ 1 ] );
+                        
+                        
+                     }
+                     break;
+               
+               }
+            
+            }  
+         
+         }else{
+         
+            signedSL2 = ( Bid > value ) ? cuHL : ( Ask < value ) ? coHL : cEmp ;
+         
+         } 
+      
+      }   
+      
+   }         
    return( 0 );
 }
 //+------------------------------------------------------------------+
@@ -1823,6 +1968,18 @@ void remove_all_HL_for_open(){
    ObjectDelete(HL_BUY_UNDER_Name);
    ObjectDelete(HL_SELL_OVER_Name);
    ObjectDelete(HL_SELL_UNDER_Name);
+
+}
+
+//+------------------------------------------------------------------+
+//| Delete all HL for close trade                                    |     
+//+------------------------------------------------------------------+
+void remove_all_HL_for_close(){
+
+   ObjectDelete(HL_CLOSE_OVER_Name);
+   ObjectDelete(HL_CLOSE_UNDER_Name);
+   ObjectDelete(HL_CLOSE_PAS_Name);
+   ObjectDelete(HL_CLOSE_PAF_Name);
 
 }
 
