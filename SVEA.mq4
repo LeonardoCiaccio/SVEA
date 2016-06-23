@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                         SVEA.mq4 |
-//|                               Copyright © 2015, Leonardo Ciaccio |
+//|                               Copyright © 2016, Leonardo Ciaccio |
 //|                          https://github.com/LeonardoCiaccio/SVEA |
 //|                                                                  |
 //|             Donate Bitcoins : 1KHSR2S58y8WV6o3zRYeD5fBApvfTMtj8B |
