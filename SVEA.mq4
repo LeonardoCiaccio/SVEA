@@ -11,7 +11,7 @@
 #property copyright "Copyright © 2016, Leonardo Ciaccio"
 #property link      "https://github.com/LeonardoCiaccio/SVEA"
 #property description "Super Visor Expert Advisor"
-#property version "2.20"
+#property version "2.40"
 #property strict
 
 enum __q{
@@ -43,6 +43,14 @@ enum __cHL{
    cuHL  = -1,   // Close under HL
    cEmp  = 0,    // No position
    coHL  = 1     // Close over HL
+   
+};
+
+enum __mBA{
+
+   
+   mB    = -1,   // Bid
+   mA    = 1     // Ask
    
 };
 
@@ -82,6 +90,7 @@ extern __q     Trailing_Ignore_TP      =  Yes;                                  
 extern string  Space3                  =  "--------------------------------------------------------";// -----------------------------
 extern string  Open_Manual_start       =  "--------------------------------------------------------";// ------- SETUP Manual Data
 extern __q     Ignore_Max_Spread       =  No;                                                        // Manual Ignore Max Spread ?
+extern __mBA   modeBidOrAsk            =  mB;                                                        // Mode for trigger
 extern string  HL_BUY_OVER_Name        =  "BO";                                                      // Name For Buy Over H-Line ( Buy Stop ) 
 extern string  HL_BUY_UNDER_Name       =  "BU";                                                      // Name For Buy Under H-Line ( Buy Limit )
 extern string  HL_SELL_OVER_Name       =  "SO";                                                      // Name For Sell Over H-Line ( Sell Limit )
@@ -1492,10 +1501,13 @@ int open_manual_mode(){
      
    double   value       =  0.0;
    int      result      =  0;   
+   
+   double myAsk = ( modeBidOrAsk == mB ) ? Bid : Ask;
+   double myBid = ( modeBidOrAsk == mB ) ? Bid : Ask;
       
    if(ObjectFind(HL_BUY_OVER_Name) >= 0){
       value=ObjectGet(HL_BUY_OVER_Name, OBJPROP_PRICE1);
-      if(value>0.0 && Ask>value){
+      if(value>0.0 && myBid>value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
             ObjectDelete(HL_BUY_OVER_Name); // Self remove this open order
@@ -1516,7 +1528,7 @@ int open_manual_mode(){
    
    if(ObjectFind(HL_BUY_UNDER_Name) >= 0){
       value=ObjectGet(HL_BUY_UNDER_Name, OBJPROP_PRICE1);
-      if(value>0.0 && Ask<value){
+      if(value>0.0 && myAsk<value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
             ObjectDelete(HL_BUY_UNDER_Name); // Self remove this open order
@@ -1537,7 +1549,7 @@ int open_manual_mode(){
    
    if(ObjectFind(HL_SELL_OVER_Name) >= 0){
       value=ObjectGet(HL_SELL_OVER_Name, OBJPROP_PRICE1);
-      if(value>0.0 && Bid>value){
+      if(value>0.0 && myBid>value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
             ObjectDelete(HL_SELL_OVER_Name); // Self remove this open order
@@ -1558,7 +1570,7 @@ int open_manual_mode(){
    
    if(ObjectFind(HL_SELL_UNDER_Name) >= 0){
       value=ObjectGet(HL_SELL_UNDER_Name, OBJPROP_PRICE1);
-      if(value>0.0 && Bid<value){
+      if(value>0.0 && myAsk<value){
          if(current_spread()>NormalizeDouble(Max_Spread,2) && !Ignore_Max_Spread){
             Alert("SVEA "+Symbol()+", current spread is out of range, do not open manual open! Move Horizontal Line");
             ObjectDelete(HL_SELL_UNDER_Name); // Self remove this open order
@@ -1781,6 +1793,9 @@ int close_manual(){
    
    double value = 0.0;
    
+   double myAsk = ( modeBidOrAsk == mB ) ? Bid : Ask;
+   double myBid = ( modeBidOrAsk == mB ) ? Bid : Ask;
+   
    if( Use_Day_Target ){
    
       double ttA = total_profit_all();
@@ -1799,7 +1814,7 @@ int close_manual(){
    if(ObjectFind(HL_CLOSE_OVER_Name) >= 0){
    
       value=ObjectGet(HL_CLOSE_OVER_Name, OBJPROP_PRICE1);
-      if(value>0.0 && Ask>value){
+      if(value>0.0 && myBid>value){
          
          if(ObjectDelete(HL_CLOSE_OVER_Name)){
             
@@ -1817,7 +1832,7 @@ int close_manual(){
    if(ObjectFind(HL_CLOSE_UNDER_Name) >= 0){
    
       value=ObjectGet(HL_CLOSE_UNDER_Name, OBJPROP_PRICE1);
-      if(value>0.0 && Bid<value){
+      if(value>0.0 && myAsk<value){
          
          if(ObjectDelete(HL_CLOSE_UNDER_Name)){
             
@@ -1842,7 +1857,7 @@ int close_manual(){
          if( signedSL != cEmp ){
          
             // Close ?
-            if( ( Bid < value && signedSL == cuHL ) || ( Ask > value && signedSL == coHL ) ){
+            if( ( myAsk < value && signedSL == cuHL ) || ( myBid > value && signedSL == coHL ) ){
          
                if(ObjectDelete(HL_CLOSE_PAS_Name)){
                   
@@ -1887,9 +1902,14 @@ int close_manual(){
          
          }else{
          
-            signedSL = ( Bid > value ) ? cuHL : ( Ask < value ) ? coHL : cEmp ;
+            signedSL = ( myBid > value ) ? cuHL : ( myAsk < value ) ? coHL : cEmp ;
          
          } 
+      
+      }else{
+      
+         signedSL = cEmp;
+         signedValueSL = 0.0;
       
       }   
       
@@ -1905,7 +1925,7 @@ int close_manual(){
          if( signedSL2 != cEmp ){
          
             // Close ?
-            if( ( Bid < value && signedSL2 == cuHL ) || ( Ask > value && signedSL2 == coHL ) ){
+            if( ( myAsk < value && signedSL2 == cuHL ) || ( myBid > value && signedSL2 == coHL ) ){
          
                if(ObjectDelete(HL_CLOSE_PAF_Name)){
                   
@@ -1924,7 +1944,7 @@ int close_manual(){
                
                   case cuHL:
                      
-                     if( High[ 0 ] > High[ 1 ] && Low[ 1 ] < Bid  ){
+                     if( High[ 0 ] > High[ 1 ] && Low[ 1 ] < myBid  ){
                      
                         ObjectSet( HL_CLOSE_PAF_Name, OBJPROP_PRICE1, Low[ 1 ] );
                           
@@ -1934,7 +1954,7 @@ int close_manual(){
                   case coHL:
                      
                      
-                     if( Low[ 0 ] < Low[ 1 ] && High[ 1 ] > Ask ){
+                     if( Low[ 0 ] < Low[ 1 ] && High[ 1 ] > myAsk ){
                      
                         ObjectSet( HL_CLOSE_PAF_Name, OBJPROP_PRICE1, High[ 1 ] );
                         
@@ -1948,9 +1968,13 @@ int close_manual(){
          
          }else{
          
-            signedSL2 = ( Bid > value ) ? cuHL : ( Ask < value ) ? coHL : cEmp ;
+            signedSL2 = ( myBid > value ) ? cuHL : ( myAsk < value ) ? coHL : cEmp ;
          
          } 
+      
+      }else{
+      
+         signedSL2 = cEmp;
       
       }   
       
